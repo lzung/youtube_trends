@@ -1,44 +1,112 @@
 from dash import dash, html, dcc, Input, Output
 import dash_bootstrap_components as dbc
+from dash_iconify import DashIconify
 import pandas as pd
 import altair as alt
-from vega_datasets import data
+import plotly.express as px
 
-# data = pd.read_csv('data/CA_youtube_trending_data_processed.csv')
-
-# Read in global data
-cars = data.cars()
+# Read in data globally
+data = pd.read_csv('data/CA_youtube_trending_data_processed.csv', parse_dates=True)
 
 # Setup app and layout/frontend
-app = dash.Dash(__name__,  external_stylesheets=[dbc.themes.DARKLY])
-app.layout = html.Div([
-    html.Iframe(
-        id='scatter',
-        style={'border-width': '0', 'width': '100%', 'height': '400px'}),
-    html.Div(
-        id='mean-x-div'),
-    dcc.Dropdown(
-        id='xcol-widget',
-        value='Horsepower',  # REQUIRED to show the plot on the first page load
-        options=[{'label': col, 'value': col} for col in cars.columns]),
-    dcc.Dropdown(
-        id='ycol-widget',
-        value='Displacement',
-        options=[{'label': col, 'value': col} for col in cars.columns])])
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[
+        "https://fonts.googleapis.com/css2?family=Assistant:wght@300&display=swap",
+        dbc.icons.FONT_AWESOME,
+        dbc.themes.JOURNAL,
+    ],
+    compress=True,
+)
+
+header = html.Div(
+    id="app-header",
+    children=[
+        html.I(DashIconify(icon="mdi:youtube"), style={"color" : "#D80808", "font-size" : "2.6em"}),
+        html.H1("YouTube Trend Visualizer", style={"display" : "inline", "font-size" : "2em", "margin-left" : "2px"})
+    ],
+    style={"align" : "center", "margin-left" : 15}
+)
+
+date_picker = dcc.DatePickerRange(
+    id="calendar",
+    min_date_allowed=min(data['trending_date']),
+    max_date_allowed=max(data['trending_date']),
+    start_date_placeholder_text="Start Date",
+    end_date_placeholder_text="End Date",
+    clearable=True
+)
+
+video_badge = dbc.Button(
+    [
+        "Total Video Count: ",
+        dbc.Badge(color="light", text_color="primary", id='video_count')
+    ],
+    disabled=True
+)
+
+channel_badge = dbc.Button(
+    [
+        "Total Channel Count: ",
+        dbc.Badge(color="light", text_color="primary", id='channel_count')
+    ],
+    disabled=True
+)
+
+
+navbar = dbc.Container(
+    [
+        dbc.Row([
+            dbc.Col([
+                html.H5("Trending Date Range:"),
+                date_picker
+            ]),
+            dbc.Col([
+                dbc.Row(video_badge),
+                dbc.Row(channel_badge, style={"margin-top" : "2px"})
+            ])
+        ])
+    ]
+)
+
+
+app.layout = html.Div(
+    [
+        header,
+        html.Hr(),
+        navbar
+    ],
+    style = {"margin" : "0"}
+)
+
+def date_filter(df, start_date, end_date):
+    if start_date is None:
+        start_date = min(data['trending_date'])
+    if end_date is None:
+        end_date = min(data['trending_date'])
+    
+    return df[(df['trending_date'] > start_date) & (df['trending_date'] < end_date)]
 
 # Set up callbacks/backend
 @app.callback(
-    Output('scatter', 'srcDoc'),
-    Output('mean-x-div', 'children'),  # This is the ID of our new output Div
-    Input('xcol-widget', 'value'),
-    Input('ycol-widget', 'value'))
-def plot_altair(xcol, ycol):
-    chart = alt.Chart(cars).mark_point().encode(
-        x=xcol,
-        y=ycol,
-        tooltip='Horsepower').interactive()
-    return chart.to_html(), f'The mean of {xcol} is {cars[xcol].mean().round(1)}'
+    Output('channel_count', 'children'),
+    Output('video_count', 'children'),
+    Input('calendar', 'start_date'),
+    Input('calendar', 'end_date'))
+def main_callback(start_date, end_date):
+    # Filter for dates
+    subset = date_filter(data, start_date, end_date)
+
+    # Get number of videos
+    vids = len(subset['video_id'].unique())
+
+    # Get number of channels
+    channels = len(subset['channelId'].unique())
+
+    return vids, channels
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
  
