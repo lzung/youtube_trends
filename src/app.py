@@ -20,6 +20,9 @@ app = dash.Dash(
     compress=True,
 )
 
+# Server
+server = app.server
+
 # HEADER
 header = html.Div(
     id="app-header",
@@ -222,8 +225,6 @@ def main_callback(start_date, end_date, category):
     trend = trend_chart(subset)
 
     return vids, channels, polar, trend
-
-server = app.server
 
 if __name__ == '__main__':
     app.run_server(debug=True)
