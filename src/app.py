@@ -223,8 +223,7 @@ def main_callback(start_date, end_date, category):
 
     return vids, channels, polar, trend
 
+server = app.server
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-
- 
