@@ -1,4 +1,4 @@
-from dash import dash, html, dcc, Input, Output
+from dash import dash, dash_table, html, dcc, Input, Output
 import dash_bootstrap_components as dbc
 from dash_iconify import DashIconify
 import pandas as pd
@@ -79,38 +79,45 @@ tools = dbc.Container(
                 html.H5("Trending Date Range:"),
                 date_picker
             ],
-            align='center'),
+            width=4),
             dbc.Col([
                 html.H5("Categories:"),
                 cat_menu
             ],
-            align='center'),
+            width=3),
             dbc.Col([
                 dbc.Row(video_badge),
                 dbc.Row(channel_badge, style={"margin-top" : "2px"})
             ],
-            align='center')
+            width={"size": 3, "offset": 1})
         ],
         justify="center")
     ]
 )
 
+# CHARTS
 polarity = dbc.Card(
     [
         dbc.CardHeader(html.H4("Polarity of Tags by Category", className="card-title")),
         dbc.CardBody(
-            dcc.Loading(
-                id="loading-4",
-                type="circle",
-                children=html.Iframe(
-                    id="polar_chart",
-                    style={
-                        "height": "22rem",
-                        "width": "100%",
-                        "border": "0"}
-                    ),
-                color="#D80808"
-            )
+            dbc.Col([
+                dcc.Loading(
+                    id="loading-1",
+                    type="circle",
+                    children=html.Iframe(
+                        id="polar_chart",
+                        style={
+                            "height": "25rem",
+                            "width": "100%",
+                            "border": "0",
+                            "display": "flex",
+                            "align-items": "center",
+                            "justify-content": "center"
+                            }
+                        ),
+                    color="#D80808"
+                )
+            ])
         )
     ],
     className="mb-3",
@@ -125,14 +132,15 @@ trends = dbc.Card(
         dbc.CardHeader(html.H4("Trending Videos over Time", className="card-title")),
         dbc.CardBody(
             dcc.Loading(
-                id="loading-4",
+                id="loading-2",
                 type="circle",
                 children=html.Iframe(
                     id="trend_chart",
                     style={
-                        "height": "22rem",
+                        "height": "25rem",
                         "width": "100%",
-                        "border": "0"
+                        "border": "0",
+                        "display": "block"
                         }
                     ),
                 color="#D80808"
@@ -146,6 +154,20 @@ trends = dbc.Card(
         }
 )
 
+table = dcc.Loading(
+    id="loading-3",
+    type="circle",
+    children=dash_table.DataTable(
+        id='table',
+        page_size=10,
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto'
+        }
+    ),
+    color="#D80808"
+)
+
 app.layout = html.Div(
     [
         header,
@@ -156,6 +178,11 @@ app.layout = html.Div(
             [
                 dbc.Col(polarity),
                 dbc.Col(trends)
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(table)
             ]
         )
     ],
@@ -175,8 +202,14 @@ def polarity_chart(df):
         x=alt.X('mean(vader_sentiment):Q', title="Average Polarity Score"),
         y=alt.Y('categoryId', sort='x', title="Category"),
         color=alt.Color('mean(vader_sentiment):Q', scale=alt.Scale(scheme='redyellowgreen', domain=[-1, 1]), title="Sentiment")
+    ).properties(
+        width='container'
     )
-    return chart.to_html()
+    chart = chart.to_html().replace(
+        "</head>",
+        "<style>.vega-embed {width: 100%;}</style></head>",
+    )
+    return chart
 
 def trend_chart(df):
     # Format x-axis depending on time frame
@@ -185,14 +218,47 @@ def trend_chart(df):
             x=alt.X('yearmonth(trending_date):O', title="Date"),
             y=alt.Y('count():Q', title="Number of Videos"),
             color=alt.Color('categoryId')
+        ).properties(
+            width='container'
+        )
+    elif (pd.to_datetime(max(df['trending_date'])) - pd.to_datetime(min(df['trending_date']))).days < 30:
+        chart = alt.Chart(df).mark_line().encode(
+            x=alt.X('trending_date:T', title="Date"),
+            y=alt.Y('count():Q', title="Number of Videos"),
+            color=alt.Color('categoryId', title='Category')
+        ).properties(
+            width='container'
         )
     else:
         chart = alt.Chart(df).mark_line().encode(
             x=alt.X('monthdate(trending_date):O', title="Date"),
             y=alt.Y('count():Q', title="Number of Videos"),
             color=alt.Color('categoryId')
+        ).properties(
+            width='container'
         )
-    return chart.to_html()
+    chart = chart.to_html().replace(
+        "</head>",
+        "<style>.vega-embed {width: 100%;}</style></head>",
+    )
+    return chart
+
+def get_data_frame(df):
+    # Get most recent entries
+    filtered = df.sort_values(by=['trending_date'], ascending=False)
+    filtered = filtered.groupby('videoId').first().reset_index()
+
+    relevant_df = filtered[['title', 'channelTitle', 'categoryId', 'view_count', 'likes', 'dislikes', 'comment_count']]
+    
+    # Add rank by number of views
+    relevant_df.insert(0, 'Rank', relevant_df['view_count'].rank(ascending=False))
+    relevant_df = relevant_df.sort_values(by=['Rank'])
+
+    relevant_df.columns = ['Rank', 'Title', 'Channel Name', 'Category', 'Views', 'Likes', 'Dislikes', 'Comments']
+    cols = [{"name": col, "id": col} for col in relevant_df.columns]
+    dt = relevant_df.to_dict('records')
+
+    return dt, cols
 
 # Set up callbacks/backend
 @app.callback(
@@ -200,6 +266,8 @@ def trend_chart(df):
     Output('channel_count', 'children'),
     Output('polar_chart', 'srcDoc'),
     Output('trend_chart', 'srcDoc'),
+    Output('table', 'data'),
+    Output('table', 'columns'),
     Input('calendar', 'start_date'),
     Input('calendar', 'end_date'),
     Input('category_filter', 'value')
@@ -223,7 +291,10 @@ def main_callback(start_date, end_date, category):
     # Get trend chart
     trend = trend_chart(subset)
 
-    return vids, channels, polar, trend
+    # Get data table
+    datatable, columns = get_data_frame(subset)
+
+    return vids, channels, polar, trend, datatable, columns
 
 if __name__ == '__main__':
     app.run_server(debug=True)
