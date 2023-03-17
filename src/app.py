@@ -37,6 +37,8 @@ date_picker = dcc.DatePickerRange(
     id="calendar",
     min_date_allowed=min(data['trending_date']),
     max_date_allowed=max(data['trending_date']),
+    start_date=min(data['trending_date']),
+    end_date=max(data['trending_date']),
     start_date_placeholder_text="Start Date",
     end_date_placeholder_text="End Date",
     clearable=True
@@ -92,6 +94,18 @@ tools = dbc.Container(
         ],
         justify="center")
     ]
+)
+
+# TABLE FILTER
+sort_table = dcc.Dropdown(
+    id='table_filter',
+    options=[
+        {'label': 'Comments', 'value': 'comment_count'},
+        {'label': 'Dislikes', 'value': 'dislikes'},
+        {'label': 'Likes', 'value': 'likes'},
+        {'label': 'Views', 'value': 'view_count'}
+   ],
+   value='view_count'
 )
 
 # CHARTS
@@ -172,14 +186,18 @@ table = dcc.Loading(
         }
         ],
         style_header={
-            'backgroundColor': '#FFA1A1',
-            'color': 'black',
+            'backgroundColor': '#D80808',
+            'color': 'white',
             'fontWeight': 'bold',
             'fontSize': '25',
-            'font-family': 'Assistant'
+            'font-family': 'Assistant',
+            'textAlign': 'center'
         },
         style_cell={
             'font-family': 'Assistant'
+        },
+        style_table={
+            'border-radius': '2px'
         },
         fill_width=False
     ),
@@ -200,9 +218,21 @@ app.layout = html.Div(
         ),
         dbc.Row(
             [
+                dbc.Col(
+                    [
+                        html.H5("Rank by:"),
+                        sort_table
+                    ],
+                    width=2
+                ),
                 dbc.Col(table, width=6)
             ],
             justify="center"
+        ),
+        html.Hr(),
+        html.Footer(
+            'Created by Lauren Zung (2023-03-18)',
+            style={'margin-bottom': '1rem'}
         )
     ],
     style = {"margin" : "0"}
@@ -262,15 +292,15 @@ def trend_chart(df):
     )
     return chart
 
-def get_data_frame(df):
+def get_data_frame(df, filter):
     # Get most recent entries
     filtered = df.sort_values(by=['trending_date'], ascending=False)
     filtered = filtered.groupby('video_id').first().reset_index()
 
     relevant_df = filtered[['title', 'channelTitle', 'categoryId', 'view_count', 'likes', 'dislikes', 'comment_count']]
     
-    # Add rank by number of views
-    relevant_df.insert(0, 'Rank', relevant_df['view_count'].rank(ascending=False))
+    # Add rank by dropdown selection
+    relevant_df.insert(0, 'Rank', relevant_df[filter].rank(ascending=False))
     relevant_df = relevant_df.sort_values(by=['Rank'])
 
     relevant_df.columns = ['Rank', 'Title', 'Channel Name', 'Category', 'Views', 'Likes', 'Dislikes', 'Comments']
@@ -289,9 +319,10 @@ def get_data_frame(df):
     Output('table', 'columns'),
     Input('calendar', 'start_date'),
     Input('calendar', 'end_date'),
-    Input('category_filter', 'value')
+    Input('category_filter', 'value'),
+    Input('table_filter', 'value')
 )
-def main_callback(start_date, end_date, category):
+def main_callback(start_date, end_date, category, table_filter):
     # Filter for dates
     subset = date_filter(data, start_date, end_date)
 
@@ -311,7 +342,7 @@ def main_callback(start_date, end_date, category):
     trend = trend_chart(subset)
 
     # Get data table
-    datatable, columns = get_data_frame(subset)
+    datatable, columns = get_data_frame(subset, table_filter)
 
     return vids, channels, polar, trend, datatable, columns
 
