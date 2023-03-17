@@ -16,8 +16,7 @@ app = dash.Dash(
         "https://fonts.googleapis.com/css2?family=Assistant:wght@300&display=swap",
         dbc.icons.FONT_AWESOME,
         dbc.themes.JOURNAL,
-    ],
-    compress=True,
+    ]
 )
 
 # Server
