@@ -59,8 +59,7 @@ video_badge = dbc.Button(
         dbc.Badge(color="light", text_color="#D80808", id='video_count')
     ],
     disabled=True,
-    style={"background-color": "#D80808"}
-    
+    style={"background-color": "#D80808", "opacity" : "100%"}
 )
 
 channel_badge = dbc.Button(
@@ -69,7 +68,7 @@ channel_badge = dbc.Button(
         dbc.Badge(color="light", text_color="#D80808", id='channel_count')
     ],
     disabled=True,
-    style={"background-color": "#D80808"}
+    style={"background-color": "#D80808", "opacity" : "100%"}
 )
 
 tools = dbc.Container(
@@ -107,7 +106,7 @@ polarity = dbc.Card(
                     children=html.Iframe(
                         id="polar_chart",
                         style={
-                            "height": "25rem",
+                            "height": "22rem",
                             "width": "100%",
                             "border": "0",
                             "display": "flex",
@@ -137,7 +136,7 @@ trends = dbc.Card(
                 children=html.Iframe(
                     id="trend_chart",
                     style={
-                        "height": "25rem",
+                        "height": "22rem",
                         "width": "100%",
                         "border": "0",
                         "display": "block"
@@ -169,16 +168,20 @@ table = dcc.Loading(
         style_data_conditional=[
         {
             'if': {'row_index': 'odd'},
-            'backgroundColor': 'rgb(220, 220, 220)',
+            'backgroundColor': '#FFD4D4',
         }
         ],
         style_header={
-            'backgroundColor': 'rgb(210, 210, 210)',
+            'backgroundColor': '#FFA1A1',
             'color': 'black',
             'fontWeight': 'bold',
-            'font-family': 'sans-serif'
+            'fontSize': '25',
+            'font-family': 'Assistant'
         },
-        style_cell={'font-family': 'sans-serif'}
+        style_cell={
+            'font-family': 'Assistant'
+        },
+        fill_width=False
     ),
     color="#D80808"
 )
@@ -197,8 +200,9 @@ app.layout = html.Div(
         ),
         dbc.Row(
             [
-                dbc.Col(table)
-            ]
+                dbc.Col(table, width=6)
+            ],
+            justify="center"
         )
     ],
     style = {"margin" : "0"}
