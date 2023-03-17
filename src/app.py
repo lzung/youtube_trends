@@ -162,8 +162,23 @@ table = dcc.Loading(
         page_size=10,
         style_data={
             'whiteSpace': 'normal',
-            'height': 'auto'
+            'height': 'auto',
+            'color': 'black',
+            'backgroundColor': 'white'
+        },
+        style_data_conditional=[
+        {
+            'if': {'row_index': 'odd'},
+            'backgroundColor': 'rgb(220, 220, 220)',
         }
+        ],
+        style_header={
+            'backgroundColor': 'rgb(210, 210, 210)',
+            'color': 'black',
+            'fontWeight': 'bold',
+            'font-family': 'sans-serif'
+        },
+        style_cell={'font-family': 'sans-serif'}
     ),
     color="#D80808"
 )
@@ -246,7 +261,7 @@ def trend_chart(df):
 def get_data_frame(df):
     # Get most recent entries
     filtered = df.sort_values(by=['trending_date'], ascending=False)
-    filtered = filtered.groupby('videoId').first().reset_index()
+    filtered = filtered.groupby('video_id').first().reset_index()
 
     relevant_df = filtered[['title', 'channelTitle', 'categoryId', 'view_count', 'likes', 'dislikes', 'comment_count']]
     
