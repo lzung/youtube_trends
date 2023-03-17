@@ -2,7 +2,7 @@
 
 Contributors: Lauren Zung
 
-Live Deployment: https://youtube-trend-visualizer.onrender.com/
+Live Server: https://youtube-trend-visualizer.onrender.com/
 
 ## Proposal
 
@@ -14,7 +14,7 @@ WIP
 
 ## Live Dashboard
 
-WIP
+The Dashboard is deployed on Render. You can view and interact with the app by [clicking here](https://youtube-trend-visualizer.onrender.com/).
 
 ## References
 

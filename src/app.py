@@ -1,5 +1,6 @@
 from dash import dash, dash_table, html, dcc, Input, Output
 import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 import pandas as pd
 import altair as alt
@@ -27,8 +28,21 @@ server = app.server
 header = html.Div(
     id="app-header",
     children=[
-        html.I(DashIconify(icon="mdi:youtube"), style={"color" : "#D80808", "font-size" : "2.6em"}),
-        html.H1("YouTube Trend Visualizer", style={"display" : "inline", "font-size" : "2em", "margin-left" : "2px"})
+        html.I(
+            DashIconify(icon="mdi:youtube"),
+            style={
+                "color" : "#D80808",
+                "font-size" : "2.6em"
+            }
+        ),
+        html.H1(
+            "YouTube Trend Visualizer",
+            style={
+                "display" : "inline",
+                "font-size" : "2em",
+                "margin-left" : "2px"
+            }
+        )
     ],
     style={"align" : "center", "margin-left" : 15}
 )
@@ -94,7 +108,15 @@ tools = dbc.Container(
             width={"size": 3, "offset": 1})
         ],
         justify="center")
-    ]
+    ],
+    style={
+        "backgroundColor": "#f4f4f4",
+        "padding": "20px 20px",
+        "border-radius": "16px",
+        "margin-bottom": "1rem",
+        "border": "1px solid lightgray",
+        "box-shadow": "0px 1px 4px 0px rgba(0, 0, 0, 0.1)"
+    }
 )
 
 # TABLE FILTER
@@ -109,10 +131,21 @@ sort_table = dcc.Dropdown(
    value='view_count'
 )
 
+# DISCLAIMER
+pop = dbc.Popover(
+    "The most recent metrics (i.e. from the latest date that a video was trending) are displayed in this table.",
+    body=True,
+    target="table_filter",
+    trigger="legacy"
+)
+
 # CHARTS
 polarity = dbc.Card(
     [
-        dbc.CardHeader(html.H4("Polarity of Tags by Category", className="card-title")),
+        dbc.CardHeader(
+            html.H4("Polarity of Tags by Category", className="card-title", style={"color": "white"}),
+            style={"background-color": "#D80808"}
+        ),
         dbc.CardBody(
             dbc.Col([
                 dcc.Loading(
@@ -137,13 +170,18 @@ polarity = dbc.Card(
     className="mb-3",
     style={
         "width": "90%",
-        "margin-left": "auto"
-        }
+        "margin-left": "auto",
+        "border": "1px solid lightgray",
+        "box-shadow": "0px 1px 4px 0px rgba(0, 0, 0, 0.1)"
+    }
 )
 
 trends = dbc.Card(
     [
-        dbc.CardHeader(html.H4("Trending Videos over Time", className="card-title")),
+        dbc.CardHeader(
+            html.H4("Trending Videos over Time", className="card-title", style={"color": "white"}),
+            style={"background-color": "#D80808"}
+        ),
         dbc.CardBody(
             dcc.Loading(
                 id="loading-2",
@@ -164,8 +202,10 @@ trends = dbc.Card(
     className="mb-3",
     style={
         "width": "90%",
-        "margin-right": "auto"
-        }
+        "margin-right": "auto",
+        "border": "1px solid lightgray",
+        "box-shadow": "0px 1px 4px 0px rgba(0, 0, 0, 0.1)"
+    }
 )
 
 table = dcc.Loading(
@@ -174,6 +214,7 @@ table = dcc.Loading(
     children=dash_table.DataTable(
         id='table',
         page_size=10,
+        filter_action="native",
         style_data={
             'whiteSpace': 'normal',
             'height': 'auto',
@@ -197,9 +238,6 @@ table = dcc.Loading(
         style_cell={
             'font-family': 'Assistant'
         },
-        style_table={
-            'border-radius': '2px'
-        },
         fill_width=False
     ),
     color="#D80808"
@@ -210,7 +248,6 @@ app.layout = html.Div(
         header,
         html.Hr(),
         tools,
-        html.Hr(),
         dbc.Row(
             [
                 dbc.Col(polarity),
@@ -222,18 +259,56 @@ app.layout = html.Div(
                 dbc.Col(
                     [
                         html.H5("Rank by:"),
-                        sort_table
+                        sort_table,
+                        pop
                     ],
                     width=2
                 ),
-                dbc.Col(table, width=6)
+                dbc.Col([
+                    html.H4("Trending YouTube Video Metrics"),
+                    table
+                ], width=6)
             ],
             justify="center"
         ),
         html.Hr(),
         html.Footer(
-            'Created by Lauren Zung (2023-03-18)',
-            style={'margin-bottom': '1rem'}
+            [
+                'Created by Lauren Zung (Last Update: 2023-03-18)',
+                dmc.Group(
+                    [
+                        dmc.Anchor(
+                            dmc.ActionIcon(
+                                DashIconify(icon="mdi:github", width=20),
+                                size="lg",
+                                variant="outline",
+                                style={"color": "#D80808"}
+                            ),
+                            href="https://github.com/lzung/youtube_trends"
+                        ),
+                        dmc.Anchor(
+                            dmc.ActionIcon(
+                                DashIconify(icon="simple-icons:kaggle", width=20),
+                                size="lg",
+                                variant="outline",
+                                style={"color": "#D80808"}
+                            ),
+                            href="https://www.kaggle.com/datasets/rsrishav/youtube-trending-video-dataset?datasetId=828106&sortBy=voteCount&select=CA_youtube_trending_data.csv"
+                        ),
+                        dmc.Anchor(
+                            dmc.ActionIcon(
+                                DashIconify(icon="mdi:linkedin", width=20),
+                                size="lg",
+                                variant="outline",
+                                style={"color": "#D80808"}
+                            ),
+                            href="https://www.linkedin.com/in/lauren-zung/"
+                        )
+                    ],
+                    style={'margin-top': 5}
+                )
+            ],
+            style={'margin-bottom': '1rem', 'margin-left': 15}
         )
     ],
     style = {"margin" : "0"}
@@ -248,10 +323,15 @@ def date_filter(df, start_date, end_date):
     return df[(df['trending_date'] >= start_date) & (df['trending_date'] <= end_date)]
 
 def polarity_chart(df):
-    chart = alt.Chart(df).mark_bar().encode(
+    # Get most recent entries to avoid repeats
+    filtered = df.sort_values(by=['trending_date'], ascending=False)
+    filtered = filtered.groupby('video_id').first().reset_index()
+
+    chart = alt.Chart(filtered).mark_bar().encode(
         x=alt.X('mean(vader_sentiment):Q', title="Average Polarity Score"),
         y=alt.Y('categoryId', sort='x', title="Category"),
-        color=alt.Color('mean(vader_sentiment):Q', scale=alt.Scale(scheme='redyellowgreen', domain=[-1, 1]), title="Sentiment")
+        color=alt.Color('mean(vader_sentiment):Q', scale=alt.Scale(scheme='redyellowgreen', domain=[-1, 1]), title="Sentiment"),
+        tooltip=[alt.Tooltip('count()', title='Number of Videos')]
     ).properties(
         width='container'
     )
@@ -263,27 +343,29 @@ def polarity_chart(df):
 
 def trend_chart(df):
     # Format x-axis depending on time frame
-    if (pd.to_datetime(max(df['trending_date'])) - pd.to_datetime(min(df['trending_date']))).days >= 30:
-        chart = alt.Chart(df).mark_line().encode(
-            x=alt.X('yearmonth(trending_date):O', title="Date"),
-            y=alt.Y('count():Q', title="Number of Videos"),
-            color=alt.Color('categoryId')
-        ).properties(
-            width='container'
-        )
-    elif (pd.to_datetime(max(df['trending_date'])) - pd.to_datetime(min(df['trending_date']))).days < 30:
-        chart = alt.Chart(df).mark_line().encode(
+    if (pd.to_datetime(max(df['trending_date'])) - pd.to_datetime(min(df['trending_date']))).days < 75:
+        chart = alt.Chart(df).mark_line(point=True).encode(
             x=alt.X('trending_date:T', title="Date"),
             y=alt.Y('count():Q', title="Number of Videos"),
-            color=alt.Color('categoryId', title='Category')
+            color=alt.Color('categoryId', title='Category', scale=alt.Scale(scheme="category20")),
+            tooltip=[
+                alt.Tooltip('trending_date:T', title='Date'),
+                alt.Tooltip('categoryId', title='Category'),
+                alt.Tooltip('count():Q', title='Number of Videos')
+            ]
         ).properties(
             width='container'
         )
     else:
-        chart = alt.Chart(df).mark_line().encode(
-            x=alt.X('monthdate(trending_date):O', title="Date"),
+        chart = alt.Chart(df).mark_line(point=True).encode(
+            x=alt.X('yearmonth(trending_date):O', title="Date"),
             y=alt.Y('count():Q', title="Number of Videos"),
-            color=alt.Color('categoryId')
+            color=alt.Color('categoryId', title='Category'),
+            tooltip=[
+                alt.Tooltip('yearmonth(trending_date):O', title='Date'),
+                alt.Tooltip('categoryId', title='Category'),
+                alt.Tooltip('count():Q', title='Number of Videos')
+            ]
         ).properties(
             width='container'
         )
@@ -294,14 +376,14 @@ def trend_chart(df):
     return chart
 
 def get_data_frame(df, filter):
-    # Get most recent entries
+    # Get most recent entries to avoid repeats
     filtered = df.sort_values(by=['trending_date'], ascending=False)
     filtered = filtered.groupby('video_id').first().reset_index()
 
     relevant_df = filtered[['title', 'channelTitle', 'categoryId', 'view_count', 'likes', 'dislikes', 'comment_count']]
     
     # Add rank by dropdown selection
-    relevant_df.insert(0, 'Rank', relevant_df[filter].rank(ascending=False))
+    relevant_df.insert(0, 'Rank', relevant_df[filter].rank(method='min', ascending=False))
     relevant_df = relevant_df.sort_values(by=['Rank'])
 
     relevant_df.columns = ['Rank', 'Title', 'Channel Name', 'Category', 'Views', 'Likes', 'Dislikes', 'Comments']
