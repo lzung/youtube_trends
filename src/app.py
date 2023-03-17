@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 from dash_iconify import DashIconify
 import pandas as pd
 import altair as alt
+from datetime import date
 
 alt.data_transformers.disable_max_rows()
 
@@ -37,8 +38,8 @@ date_picker = dcc.DatePickerRange(
     id="calendar",
     min_date_allowed=min(data['trending_date']),
     max_date_allowed=max(data['trending_date']),
-    start_date=min(data['trending_date']),
-    end_date=max(data['trending_date']),
+    start_date=date(2020, 8, 11),
+    end_date=date(2020, 8, 18),
     start_date_placeholder_text="Start Date",
     end_date_placeholder_text="End Date",
     clearable=True
