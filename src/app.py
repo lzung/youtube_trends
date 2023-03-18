@@ -24,6 +24,9 @@ app = dash.Dash(
 # Server
 server = app.server
 
+# Title
+app.title = 'YouTube Trend Visualizer'
+
 # HEADER
 header = html.Div(
     id="app-header",
@@ -110,7 +113,7 @@ tools = dbc.Container(
         justify="center")
     ],
     style={
-        "backgroundColor": "#f4f4f4",
+        "backgroundColor": "#F4F4F4",
         "padding": "20px 20px",
         "border-radius": "16px",
         "margin-bottom": "1rem",
