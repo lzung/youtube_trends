@@ -1,6 +1,6 @@
 # 📺 YouTube Trend Visualizer
 
-[Demo](img/dash_dashboard.gif)
+![Demo](img/dash_dashboard.gif)
 
 Contributors: Lauren Zung
 
@@ -12,13 +12,13 @@ Click [here](https://github.com/UBC-MDS/trending_youtube_viz_R/blob/main/reports
 
 ## Usage
 
-Users can filter for videos between a date range using the calendar widget. This will update each plot and table to store the
+This dashboard features a single landing page with interactive visualizations to provide users with easy access to YouTube video metrics. There is a calendar widget that can be configured to focus on trending videos between a date range. If desired, users can apply an additional filter using the dropdown category menu, which can be parsed by selecting and/or searching for topics of interest. These filters will update the settings for each plot and table, allowing for improved visibility and interpretation of trends over time.
 
-### Polarity Score Chart
+### 😀 Polarity Score Chart 😩
 
-### Category Trend Chart
+### 📈 Category Trend Chart 📉
 
-### Video Metrics Table
+### 👍 Video Metrics Table 👎
 
 ## Live Dashboard
 
