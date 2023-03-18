@@ -1,5 +1,7 @@
 # 📺 YouTube Trend Visualizer
 
+[Demo](img/dash_dashboard.gif)
+
 Contributors: Lauren Zung
 
 Live Server: https://youtube-trend-visualizer.onrender.com/
@@ -10,7 +12,13 @@ Click [here](https://github.com/UBC-MDS/trending_youtube_viz_R/blob/main/reports
 
 ## Usage
 
-WIP
+Users can filter for videos between a date range using the calendar widget. This will update each plot and table to store the
+
+### Polarity Score Chart
+
+### Category Trend Chart
+
+### Video Metrics Table
 
 ## Live Dashboard
 
