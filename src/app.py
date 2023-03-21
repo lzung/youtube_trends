@@ -142,7 +142,7 @@ pop = dbc.Popover(
     trigger="legacy"
 )
 
-# CHARTS
+# CHARTS / TABLE
 polarity = dbc.Card(
     [
         dbc.CardHeader(
@@ -246,6 +246,7 @@ table = dcc.Loading(
     color="#D80808"
 )
 
+# LAYOUT
 app.layout = html.Div(
     [
         header,
@@ -317,6 +318,7 @@ app.layout = html.Div(
     style = {"margin" : "0"}
 )
 
+# HELPER FUNCTIONS
 def date_filter(df, start_date, end_date):
     if start_date is None:
         start_date = min(df['trending_date'])
