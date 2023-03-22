@@ -403,14 +403,11 @@ def get_data_frame(df, filter):
     Output('channel_count', 'children'),
     Output('polar_chart', 'srcDoc'),
     Output('trend_chart', 'srcDoc'),
-    Output('table', 'data'),
-    Output('table', 'columns'),
     Input('calendar', 'start_date'),
     Input('calendar', 'end_date'),
-    Input('category_filter', 'value'),
-    Input('table_filter', 'value')
+    Input('category_filter', 'value')
 )
-def main_callback(start_date, end_date, category, table_filter):
+def chart_callback(start_date, end_date, category):
     # Filter for dates
     subset = date_filter(data, start_date, end_date)
 
@@ -429,10 +426,27 @@ def main_callback(start_date, end_date, category, table_filter):
     # Get trend chart
     trend = trend_chart(subset)
 
+    return vids, channels, polar, trend
+
+@app.callback(
+    Output('table', 'data'),
+    Output('table', 'columns'),
+    Input('calendar', 'start_date'),
+    Input('calendar', 'end_date'),
+    Input('category_filter', 'value'),
+    Input('table_filter', 'value')
+)
+def table_callback(start_date, end_date, category, table_filter):
+    # Filter for dates
+    subset = date_filter(data, start_date, end_date)
+
+    if category:
+        subset = subset[subset['categoryId'].isin(category)]
+
     # Get data table
     datatable, columns = get_data_frame(subset, table_filter)
 
-    return vids, channels, polar, trend, datatable, columns
+    return datatable, columns
 
 if __name__ == '__main__':
     app.run_server(debug=True)

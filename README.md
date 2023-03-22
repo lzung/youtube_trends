@@ -12,12 +12,15 @@ Click [here](https://github.com/UBC-MDS/trending_youtube_viz_R/blob/main/reports
 
 ## Dashboard Features
 
-This dashboard features a single landing page that allows users to easily visualize YouTube video metrics. There is a calendar widget that can be configured to focus on trending videos between a date range. If desired, users can apply an additional filter using the dropdown category menu, which can be parsed by selecting and/or searching for topics of interest. These filters will update the settings for each plot and table, allowing for improved visibility and interpretation of trends over time. Aggregate counts of the number of videos and channels are also displayed to provide a comprehensive overview on the amount of data points displayed.
+This dashboard contains a single landing page that allows users to easily visualize YouTube video metrics. There is a calendar widget that can be configured to focus on trending videos between a date range. If desired, users can apply an additional filter using the dropdown category menu, which can be parsed by selecting and/or searching for topics of interest. These filters will update the settings for each plot and table, allowing for improved visibility and interpretation of trends over time. Aggregate counts of the number of videos and channels are also displayed to provide a comprehensive overview on the amount of data points displayed.
 
 ### 😀 Polarity Score Chart 😩
 
+The polarity score of a video's taglist can be obtained using the `nltk` library.
+
 ### 📈 Category Trend Chart 📉
 
+### 👍 Video Metrics Table 👎
 
 ## Usage
 
@@ -55,6 +58,7 @@ python3 app.py
 ```
 
 ## Dependencies
+
 The associated environment with all dependencies required for this project can be found [here](https://github.com/lzung/youtube_trends/blob/main/environment.yaml).
 - python==3.11.*
 - ipykernel
