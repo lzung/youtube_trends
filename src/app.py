@@ -217,7 +217,8 @@ table = dcc.Loading(
     children=dash_table.DataTable(
         id='table',
         page_size=10,
-        filter_action="native",
+        filter_action='native',
+        sort_action='native',
         style_data={
             'whiteSpace': 'normal',
             'height': 'auto',
@@ -239,7 +240,8 @@ table = dcc.Loading(
             'textAlign': 'center'
         },
         style_cell={
-            'font-family': 'Assistant'
+            'font-family': 'Assistant',
+            'text-align': 'center'
         },
         fill_width=False
     ),
