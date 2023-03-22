@@ -136,7 +136,7 @@ sort_table = dcc.Dropdown(
 
 # DISCLAIMER
 pop = dbc.Popover(
-    "The most recent metrics (i.e. from the latest date that a video was trending) are displayed in this table.",
+    "The most recent metrics (i.e. from the latest date that a video was trending) are displayed in this table.\nNote: Only text columns can be filtered.",
     body=True,
     target="table_filter",
     trigger="legacy"
@@ -409,12 +409,12 @@ def get_data_frame(df, filter):
     Input('calendar', 'end_date'),
     Input('category_filter', 'value')
 )
-def chart_callback(start_date, end_date, category):
+def chart_callback(start_date, end_date, category_filter):
     # Filter for dates
     subset = date_filter(data, start_date, end_date)
 
-    if category:
-        subset = subset[subset['categoryId'].isin(category)]
+    if category_filter:
+        subset = subset[subset['categoryId'].isin(category_filter)]
 
     # Get number of videos
     vids = len(subset['video_id'].unique())
@@ -438,12 +438,12 @@ def chart_callback(start_date, end_date, category):
     Input('category_filter', 'value'),
     Input('table_filter', 'value')
 )
-def table_callback(start_date, end_date, category, table_filter):
+def table_callback(start_date, end_date, category_filter, table_filter):
     # Filter for dates
     subset = date_filter(data, start_date, end_date)
 
-    if category:
-        subset = subset[subset['categoryId'].isin(category)]
+    if category_filter:
+        subset = subset[subset['categoryId'].isin(category_filter)]
 
     # Get data table
     datatable, columns = get_data_frame(subset, table_filter)
