@@ -83,6 +83,10 @@ The associated environment with all dependencies required for this project can b
 
 The dashboard is deployed on Render. You can view and interact with the app by [clicking here](https://youtube-trend-visualizer.onrender.com/).
 
+## License
+
+`youtube_trends` was created by Lauren Zung. It is licensed under the terms of the MIT license.
+
 ## References
 
 Youtube. (2023). YouTube Trending Video Dataset (updated daily) [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/5003820
