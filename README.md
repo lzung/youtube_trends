@@ -8,7 +8,7 @@ Live Server: https://youtube-trend-visualizer.onrender.com/
 
 ## Proposal
 
-Click [here](https://github.com/UBC-MDS/trending_youtube_viz_R/blob/main/reports/proposal.md) to read the initial motivation and purpose of this dashboard.
+Click [here](https://github.com/UBC-MDS/trending_youtube_viz_R/blob/main/reports/proposal.md) to read the initial motivation and purpose for this dashboard.
 
 ## Dashboard Features
 
@@ -16,11 +16,17 @@ This dashboard contains a single landing page that allows users to easily visual
 
 ### 😀 Polarity Score Chart 😩
 
-The polarity score of a video's taglist can be obtained using the `nltk` library.
+The polarity score of a video's taglist can be computed using the [Natural Language Toolkit sentiment analysis](https://www.nltk.org/howto/sentiment.html) library. This package contains a pre-trained model called **VADER** (Valence Aware Dictionary for Sentiment Reasoning) which can be leveraged to assign proportional polarity scores for positive, neutral and negative sentiment in text, as well as a compound score that is normalized between -1 and 1.
+
+The bar plot displays this compound score as an average for each category of videos. Hovering over each bar shows the number of videos that comprise each category. Categories with tag lists that are considered more "positive" are closer to green, whereas categories with "negative" sentiment will appear more red (neutral is yellow).
 
 ### 📈 Category Trend Chart 📉
 
+Users may be interested in seeing how many videos were trending over time in each category. A dotted line chart displays these fluctuations by date within a specified ranged (with the ability to mouse over points for summaries) to better examine trends in cases where lines may be overlapping or unclear.
+
 ### 👍 Video Metrics Table 👎
+
+To parse details on the data included in the above charts, users may reference the metrics table for the title, channel name and category for each trending video. It features sorting and filtering options to allow you to search for specific channels, titles and categories or individual words like 'BTS' or 'VEVO'. The ranking widget assigns a rank according to the number of likes, dislikes, comments or views that a video received relative to others in the filtered data, thus allowing users to see these positions while ordering by another metric if desired (ex. rank by view, order by dislikes).
 
 ## Usage
 
@@ -50,12 +56,14 @@ Assuming that the environment was created successfully, you can activate the env
 conda activate youtube_trends
 ```
 
-4. Navigate to the `src` folder and run `app.py` to render the dashboard locally. If you want to add your own dataset, first import your data (as a `.csv`), then run the `feature_engineering.py` script to export before deploying the dashboard.
+4. Navigate to the `src` folder and run `app.py` to render the dashboard.  You can view the app locally by opening a browser on port 8050 (`http://127.0.0.1:8050/`).
 
 ```bash
 cd src
-python3 app.py
+python app.py
 ```
+
+If you want to add your own dataset, first import your data (as a `.csv`), then run the `feature_engineering.py` script with the appropriate file path to export.
 
 ## Dependencies
 
